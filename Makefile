@@ -7,6 +7,8 @@ INC_DIR = include
 OBJ_DIR = obj
 BIN_DIR = bin
 
+SAMPLE_DIR = sample
+
 SRCS = $(shell find $(SRC_DIR) -name '*.swift')
 OBJS = $(subst $(SRC_DIR),$(OBJ_DIR),$(SRCS:.swift=.o))
 
@@ -19,7 +21,7 @@ BINFLAGS = -lc -L$(LIBS) -dynamic
 INCLUDE_FILE = $(INC_DIR)/$(MODULE).swiftmodule
 DYLIB_FILE = $(CURDIR)/$(BIN_DIR)/lib$(MODULE).dylib
 
-.PHONY: default all flags clean
+.PHONY: default all includes libs sample clean
 
 default: $(INCLUDE_FILE) $(DYLIB_FILE)
 
@@ -42,6 +44,9 @@ includes: $(INCLUDE_FILE)
 
 libs: $(DYLIB_FILE)
 	@echo "-L$(CURDIR)/$(BIN_DIR) -l$(MODULE)"
+
+sample: $(INCLUDE_FILE) $(DYLIB_FILE)
+	@cd $(SAMPLE_DIR); make
 
 clean:
 	rm -rf $(INC_DIR) $(OBJ_DIR) $(BIN_DIR)
