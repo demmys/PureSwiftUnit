@@ -9,20 +9,20 @@ public protocol TestUnit {
 
 public enum TestResult {
     case Success
-    case Failure(FailurePlace)
-}
+    case Failure(String)
+    case Pending(String)
 
-public struct FailurePlace {
-    public let file: String
-    public let function: String
-
-    public init(_ file: String, _ function: String) {
-        self.file = file
-        self.function = function
+    public static func buildFailure(parameter: String,
+                                    expected: String,
+                                    actual: String) -> TestResult {
+        return .Failure("expected \(parameter) to \(expected) but actual is \(actual).")
     }
-
-    public func stringify() -> String {
-        return "\(file):\(function)"
+    public static func buildFailure(parameter: String,
+                                    expected: Int,
+                                    actual: Int) -> TestResult {
+        return TestResult.buildFailure(parameter,
+                                       expected: String(expected),
+                                       actual: String(actual))
     }
 }
 
@@ -31,7 +31,7 @@ public class TestCase {
     private let test: () -> TestResult
     public let description: String
 
-    public init(manager: TestUnit, test: () -> TestResult, description: String) {
+    public init(_ manager: TestUnit, test: () -> TestResult, description: String) {
         self.manager = manager
         self.test = test
         self.description = description
