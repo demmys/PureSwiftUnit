@@ -8,11 +8,13 @@ public class Tester {
     }
 
     public func run(reporter: TestReporter) {
+        reporter.testStarting(testUnits)
         for testUnit in testUnits {
-            reporter.testUnitStarting(testUnit.description)
+            reporter.testUnitStarting(testUnit)
             runTestUnit(reporter, testUnit: testUnit)
-            reporter.testUnitFinished(testUnit.description)
+            reporter.testUnitFinished(testUnit)
         }
+        reporter.testFinished(testUnits)
     }
 
     private func runTestUnit(reporter: TestReporter, testUnit: TestUnit) {
@@ -20,9 +22,11 @@ public class Tester {
         for testCase in testUnit.testCases {
             switch testCase.run() {
             case .Success:
-                reporter.testCaseSucceeded(testCase.description)
-            case let .Failure(place):
-                reporter.testCaseFailed(testCase.description, place: place)
+                reporter.testCaseSucceeded(testCase)
+            case let .Failure(reason):
+                reporter.testCaseFailed(testCase, reason: reason)
+            case let .Pending(reason):
+                reporter.testCasePending(testCase, reason: reason)
             }
         }
         testUnit.tearDown()
