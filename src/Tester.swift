@@ -16,6 +16,7 @@ public class Tester {
     }
 
     private func runTestUnit(reporter: TestReporter, testUnit: TestUnit) {
+        testUnit.setUp()
         for testCase in testUnit.testCases {
             switch testCase.run() {
             case .Success:
@@ -24,5 +25,6 @@ public class Tester {
                 reporter.testCaseFailed(testCase.description, place: place)
             }
         }
+        testUnit.tearDown()
     }
 }

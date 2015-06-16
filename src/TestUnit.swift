@@ -2,6 +2,8 @@ public protocol TestUnit {
     var description: String { get }
     var testCases: [TestCase] { get }
     func setUp()
+    func beforeCase()
+    func afterCase()
     func tearDown()
 }
 
@@ -36,9 +38,9 @@ public class TestCase {
     }
 
     internal func run() -> TestResult {
-        manager.setUp()
+        manager.beforeCase()
         let result = test()
-        manager.tearDown()
+        manager.afterCase()
         return result
     }
 }
