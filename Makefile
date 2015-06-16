@@ -37,8 +37,11 @@ $(OBJS): $(SRCS)
 
 all: clean default
 
-flags: $(INCLUDE_FILE) $(DYLIB_FILE)
-	@echo "-L$(CURDIR)/$(BIN_DIR) -I$(CURDIR)/$(INC_DIR) -l$(MODULE)"
+includes: $(INCLUDE_FILE)
+	@echo "-I$(CURDIR)/$(INC_DIR)"
+
+libs: $(DYLIB_FILE)
+	@echo "-L$(CURDIR)/$(BIN_DIR) -l$(MODULE)"
 
 clean:
 	rm -rf $(INC_DIR) $(OBJ_DIR) $(BIN_DIR)
