@@ -17,7 +17,7 @@ OBJFLAGS = -module-name $(MODULE) -emit-library -emit-object
 BINFLAGS = -lc -L$(LIBS) -dynamic
 
 INCLUDE_FILE = $(INC_DIR)/$(MODULE).swiftmodule
-DYLIB_FILE = $(BIN_DIR)/lib$(MODULE).dylib
+DYLIB_FILE = $(CURDIR)/$(BIN_DIR)/lib$(MODULE).dylib
 
 .PHONY: default all flags clean
 
