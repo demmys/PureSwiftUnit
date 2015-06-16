@@ -26,10 +26,3 @@ public class Tester {
         }
     }
 }
-
-public protocol TestReporter {
-    func testUnitStarting(description: String)
-    func testUnitFinished(description: String)
-    func testCaseSucceeded(description: String)
-    func testCaseFailed(description: String, place: FailurePlace)
-}
