@@ -4,7 +4,7 @@ Simplest unit testing framework for PURE Swift codes.
 
 ## Requirement
 
-* Swift 2.0 or higher
+* Swift 2.0 or later
 
 ## Install
 
