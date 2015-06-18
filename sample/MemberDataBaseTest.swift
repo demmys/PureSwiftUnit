@@ -16,43 +16,21 @@ class MemberDataBaseTest : TestUnit {
         db = MemberDataBase()
     }
 
-    private func canAddMember() -> TestResult {
+    private func canAddMember() throws {
         let id = db.addMember("John Lennon")
-        guard db.memberCount() == 1 else {
-            return TestResult.buildFailure(
-                "member count", expected: 1, actual: db.memberCount()
-            )
-        }
-        guard db.nextId() == id + 1 else {
-            return TestResult.buildFailure(
-                "next id", expected: id + 1, actual: db.nextId()
-            )
-        }
-        return .Success
+        try equals("member count", db.memberCount(), 1)
+        try equals("next id", db.nextId(), id + 1)
     }
 
-    private func canRemoveMember() -> TestResult {
+    private func canRemoveMember() throws {
         let id = db.addMember("John Lennon")
         let result = db.removeMember(id)
-        guard result else {
-            return TestResult.buildFailure(
-                "result of removeMember", expected: "true", actual: "false"
-            )
-        }
-        guard db.memberCount() == 0 else {
-            return TestResult.buildFailure(
-                "member count", expected: 0, actual: db.memberCount()
-            )
-        }
-        guard db.nextId() == id + 1 else {
-            return TestResult.buildFailure(
-                "next id", expected: id + 1, actual: db.nextId()
-            )
-        }
-        return .Success
+        try isTrue("result of removeMember", result)
+        try equals("member count", db.memberCount(), 0)
+        try equals("next id", db.nextId(), id + 1)
     }
 
-    private func canClearAll() -> TestResult {
-        return .Pending("\"clearAll\" method is removed now.")
+    private func canClearAll() throws {
+        throw PendingReason.Text("\"clearAll\" method is removed now.")
     }
 }

@@ -11,41 +11,90 @@ public class TestUnit {
     public func beforeCase() {}
     public func afterCase() {}
 
-    public func setTestCases(tests: [(String, () -> TestResult)]) {
+    public func setTestCases(tests: [(String, () throws -> ())]) {
         self.testCases = []
         for (d, t) in tests {
             self.testCases.append(TestCase(manager: self, test: t, description: d))
+        }
+    }
+
+    public func isTrue(t: String, _ v: Bool) throws {
+        guard v else {
+            throw FailureReason.ExpectedTrue(t)
+        }
+    }
+
+    public func isFalse(t: String, _ v: Bool) throws {
+        guard !v else {
+            throw FailureReason.ExpectedFalse(t)
+        }
+    }
+
+    public func equals<T: Equatable>(t: String, _ l: T, _ r: T) throws {
+        guard l == r else {
+            throw FailureReason.ExpectedEqual(t, String(l), String(r))
+        }
+    }
+
+    public func notEquals<T: Equatable>(t: String, _ l: T, _ r: T) throws {
+        guard l != r else {
+            throw FailureReason.ExpectedNotEqual(t, String(l), String(r))
+        }
+    }
+}
+
+public enum FailureReason : ErrorType {
+    case Unexpected
+    case ExpectedTrue(String)
+    case ExpectedFalse(String)
+    case ExpectedEqual(String, String, String)
+    case ExpectedNotEqual(String, String, String)
+
+    public func stringify() -> String {
+        switch self {
+        case .Unexpected:
+            return "unexpected error occured"
+        case let .ExpectedTrue(t):
+            return template(t, "true", "false")
+        case let .ExpectedFalse(t):
+            return template(t, "false", "true")
+        case let .ExpectedEqual(t, l, r):
+            return template(t, l, r)
+        case let .ExpectedNotEqual(t, l, r):
+            return template(t, l, r)
+        }
+    }
+
+    private func template(t: String, _ e: String, _ a: String) -> String {
+        return "expected \(t) to \(e) but actual is \(a)"
+    }
+}
+
+public enum PendingReason : ErrorType {
+    case Text(String)
+
+    func stringify() -> String {
+        switch self {
+        case let .Text(s):
+            return s
         }
     }
 }
 
 public enum TestResult {
     case Success
-    case Failure(String)
-    case Pending(String)
-
-    public static func buildFailure(
-        parameter: String, expected: String, actual: String
-    ) -> TestResult {
-        return .Failure(
-            "expected \(parameter) to \(expected) but actual is \(actual)."
-        )
-    }
-    public static func buildFailure(
-        parameter: String, expected: Int, actual: Int
-    ) -> TestResult {
-        return TestResult.buildFailure(
-            parameter, expected: String(expected), actual: String(actual)
-        )
-    }
+    case Failure(FailureReason)
+    case Pending(PendingReason)
 }
 
 public class TestCase {
     private let manager: TestUnit
-    private let test: () -> TestResult
+    private let test: () throws -> ()
     public let description: String
 
-    public init(manager: TestUnit, test: () -> TestResult, description: String) {
+    public init(
+        manager: TestUnit, test: () throws -> (), description: String
+    ) {
         self.manager = manager
         self.test = test
         self.description = description
@@ -53,8 +102,18 @@ public class TestCase {
 
     internal func run() -> TestResult {
         manager.beforeCase()
-        let result = test()
-        manager.afterCase()
-        return result
+        do {
+            try test()
+            manager.afterCase()
+            return .Success
+        } catch let f as FailureReason {
+            manager.afterCase()
+            return .Failure(f)
+        } catch let p as PendingReason {
+            manager.afterCase()
+            return .Pending(p)
+        } catch {
+            return .Failure(.Unexpected)
+        }
     }
 }

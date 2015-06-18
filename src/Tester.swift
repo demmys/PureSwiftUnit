@@ -23,10 +23,10 @@ public class Tester {
             switch testCase.run() {
             case .Success:
                 reporter.testCaseSucceeded(testCase)
-            case let .Failure(reason):
-                reporter.testCaseFailed(testCase, reason: reason)
-            case let .Pending(reason):
-                reporter.testCasePending(testCase, reason: reason)
+            case let .Failure(fr):
+                reporter.testCaseFailed(testCase, reason: fr.stringify())
+            case let .Pending(pr):
+                reporter.testCasePending(testCase, reason: pr.stringify())
             }
         }
         testUnit.tearDown()
