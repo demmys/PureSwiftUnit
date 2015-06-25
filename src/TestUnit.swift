@@ -41,6 +41,18 @@ public class TestUnit {
             throw FailureReason.ExpectedNotEqual(t, String(l), String(r))
         }
     }
+
+    public func isNil<T>(t: String, _ v: T?) throws {
+        guard v == nil else {
+            throw FailureReason.ExpectedNil(t, String(v))
+        }
+    }
+
+    public func isNotNil<T>(t: String, _ v: T?) throws {
+        guard let _ = v else {
+            throw FailureReason.ExpectedNotNil(t)
+        }
+    }
 }
 
 public enum FailureReason : ErrorType {
@@ -50,6 +62,8 @@ public enum FailureReason : ErrorType {
     case ExpectedFalse(String)
     case ExpectedEqual(String, String, String)
     case ExpectedNotEqual(String, String, String)
+    case ExpectedNil(String, String)
+    case ExpectedNotNil(String)
 
     public func stringify() -> String {
         switch self {
@@ -65,6 +79,10 @@ public enum FailureReason : ErrorType {
             return template(t, l, r)
         case let .ExpectedNotEqual(t, l, r):
             return template(t, l, r)
+        case let .ExpectedNil(t, v):
+            return template(t, "nil", v)
+        case let .ExpectedNotNil(t):
+            return template(t, "not nil", "nil")
         }
     }
 
