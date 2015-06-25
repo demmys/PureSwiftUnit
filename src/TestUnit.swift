@@ -45,6 +45,7 @@ public class TestUnit {
 
 public enum FailureReason : ErrorType {
     case Unexpected
+    case Text(String)
     case ExpectedTrue(String)
     case ExpectedFalse(String)
     case ExpectedEqual(String, String, String)
@@ -54,6 +55,8 @@ public enum FailureReason : ErrorType {
         switch self {
         case .Unexpected:
             return "unexpected error occured"
+        case let .Text(t):
+            return t
         case let .ExpectedTrue(t):
             return template(t, "true", "false")
         case let .ExpectedFalse(t):
